@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>DeenScreen Test Page</title>
+  <style>
+    body { background:#0b0f0d; color:#e6f2ea; font:15px/1.5 system-ui,sans-serif; max-width:760px; margin:40px auto; padding:0 16px; }
+    h1 { color:#22c55e; }
+    video { width:100%; border-radius:12px; background:#000; margin-top:12px; }
+    code { background:#131a16; padding:2px 6px; border-radius:6px; }
+    .box { background:#131a16; border:1px solid #223029; border-radius:12px; padding:12px 16px; }
+    #clock { font-variant-numeric:tabular-nums; font-size:20px; color:#22c55e; }
+  </style>
+</head>
+<body>
+  <h1>DeenScreen test page</h1>
+  <div class="box">
+    <p>Pick any video file from your computer. It plays in a normal HTML5 video player so you can test DeenScreen without YouTube.</p>
+    <input type="file" id="picker" accept="video/*" />
+    <p>Current time: <span id="clock">0:00</span> &nbsp; Muted: <span id="muted">no</span></p>
+  </div>
+  <video id="player" controls></video>
+  <script>
+    const v = document.getElementById("player");
+    document.getElementById("picker").addEventListener("change", (e) => {
+      const f = e.target.files[0];
+      if (f) { v.src = URL.createObjectURL(f); v.play(); }
+    });
+    setInterval(() => {
+      const t = Math.floor(v.currentTime);
+      document.getElementById("clock").textContent = Math.floor(t / 60) + ":" + String(t % 60).padStart(2, "0");
+      document.getElementById("muted").textContent = v.muted ? "YES" : "no";
+    }, 200);
+  </script>
+</body>
+</html>

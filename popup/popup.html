@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>DeenScreen</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <img src="../icons/icon48.png" alt="" class="logo" />
+      <div>
+        <div class="name">DeenScreen</div>
+        <div class="sub" id="masterLabel">Protection on</div>
+      </div>
+    </div>
+    <label class="switch big" title="Turn DeenScreen on or off">
+      <input type="checkbox" id="masterSwitch" checked />
+      <span class="slider"></span>
+    </label>
+  </header>
+
+  <main id="content">
+    <section class="card status" id="statusCard">
+      <div class="status-row">
+        <span class="dot" id="statusDot"></span>
+        <span class="status-text" id="statusText">Checking this tab...</span>
+        <span class="pill" id="platformPill" hidden></span>
+      </div>
+      <div class="video-title" id="videoTitle"></div>
+      <div class="video-time" id="videoTime"></div>
+    </section>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="filters">Filters</button>
+      <button class="tab" data-tab="settings">Settings</button>
+    </nav>
+
+    <!-- FILTERS TAB -->
+    <section class="panel" id="panel-filters">
+      <div class="card" id="filterForm">
+        <div class="form-title">Add a section to filter</div>
+        <div class="row">
+          <label class="field">
+            <span>Start</span>
+            <div class="input-wrap">
+              <input id="startInput" placeholder="1:30" autocomplete="off" />
+              <button class="mini" id="startNow" title="Use the video's current time">Now</button>
+            </div>
+          </label>
+          <label class="field">
+            <span>End</span>
+            <div class="input-wrap">
+              <input id="endInput" placeholder="2:05" autocomplete="off" />
+              <button class="mini" id="endNow" title="Use the video's current time">Now</button>
+            </div>
+          </label>
+        </div>
+        <div class="segmented" role="radiogroup" aria-label="Action">
+          <button class="seg active" data-action="skip">⏭ Skip</button>
+          <button class="seg" data-action="mute">🔇 Mute</button>
+        </div>
+        <button class="primary" id="addBtn">Add filter</button>
+        <div class="hint">Times can be seconds (90), m:ss (1:30) or h:mm:ss (1:02:03).</div>
+        <div class="error" id="formError"></div>
+      </div>
+
+      <div class="list-head">
+        <span>Saved for this video</span>
+        <span class="count" id="filterCount">0</span>
+      </div>
+      <ul class="filter-list" id="filterList"></ul>
+      <div class="empty" id="emptyState">No filters yet for this video.</div>
+    </section>
+
+    <!-- SETTINGS TAB -->
+    <section class="panel" id="panel-settings" hidden>
+      <div class="notice">
+        <strong>Not functional yet.</strong> Automatic filtering is not built.
+        These switches only save your preferences for a future version. Right now
+        DeenScreen only filters the sections you add yourself.
+      </div>
+      <ul class="cat-list" id="catList"></ul>
+    </section>
+  </main>
+
+  <div class="paused-overlay" id="pausedOverlay" hidden>
+    DeenScreen is off. No sections will be skipped or muted.
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
