@@ -4,12 +4,14 @@
  * and reads/writes filters + settings in chrome.storage.local.
  */
 
-// Future automatic-filter categories. Saved only, NOT functional yet.
+// Automatic-filter categories. Only "profanity" does something so far
+// (v2: YouTube subtitles, v3: AI muting of spoken words in video files).
+// Everything else is saved only, NOT functional yet.
 const CATEGORIES = [
   { id: "nudity", label: "Nudity" },
   { id: "sexual", label: "Sexual content" },
   { id: "music", label: "Music" },
-  { id: "profanity", label: "Profanity" },
+  { id: "profanity", label: "Profanity", active: "Active (AI audio + subtitles)" },
   { id: "lgbtq", label: "LGBTQ+ romantic or thematic content" },
   { id: "violence", label: "Violence" },
 ];
@@ -61,7 +63,7 @@ async function getStatus() {
   if (!res) {
     // Tab was probably open before DeenScreen was installed. Inject now.
     try {
-      await chrome.scripting.executeScript({ target: { tabId: ui.tabId }, files: ["src/content.js"] });
+      await chrome.scripting.executeScript({ target: { tabId: ui.tabId }, files: ["src/profanity.js", "src/content.js"] });
       res = await sendToTab({ type: "DS_GET_STATUS" });
     } catch (e) {
       res = null; // chrome:// pages, the Web Store, etc. cannot be scripted
@@ -83,6 +85,7 @@ function renderStatus(s) {
     pill.hidden = true;
     $("videoTitle").textContent = "Open a YouTube video or a page with a video.";
     $("videoTime").textContent = "";
+    $("speechLine").hidden = true;
     setFormEnabled(false);
     return;
   }
@@ -92,6 +95,7 @@ function renderStatus(s) {
     pill.hidden = true;
     $("videoTitle").textContent = "Start playing a video, then reopen this popup.";
     $("videoTime").textContent = "";
+    $("speechLine").hidden = true;
     setFormEnabled(false);
     return;
   }
@@ -104,6 +108,40 @@ function renderStatus(s) {
   const state = s.muting ? "  🔇 muting" : s.paused ? "  ⏸ paused" : "  ▶ playing";
   $("videoTime").textContent = `${fmt(s.currentTime)} / ${fmt(s.duration)}${state}`;
   setFormEnabled(!!s.videoKey);
+  renderSpeech(s.speech);
+}
+
+// (v3) One line about the AI spoken-profanity filter for this video.
+function renderSpeech(sp) {
+  const el = $("speechLine");
+  el.className = "speech-line";
+  if (!sp || sp.status === "off") {
+    el.hidden = true;
+    return;
+  }
+  el.hidden = false;
+  const muted = sp.muted === 1 ? "1 swear word muted" : `${sp.muted || 0} swear words muted`;
+  let text;
+  switch (sp.status) {
+    case "unsupported":
+      text = "🎙️ AI audio filter not available here. " + sp.message;
+      el.classList.add("dim");
+      break;
+    case "error":
+      text = "⚠️ AI audio filter: " + sp.message;
+      el.classList.add("bad");
+      break;
+    case "analyzing":
+      text = `🎙️ AI listened to ${fmt(sp.covered)} of ${fmt(sp.duration)} · ${muted}`;
+      break;
+    case "done":
+      text = `🎙️ Whole video checked by AI · ${muted}`;
+      el.classList.add("good");
+      break;
+    default:
+      text = "🎙️ " + (sp.message || "Starting AI audio filter...") + " (muted until ready)";
+  }
+  el.textContent = text;
 }
 
 function setFormEnabled(on) {
@@ -212,6 +250,11 @@ function renderCategories(saved) {
       <span class="soon">Not yet functional</span>
       <label class="switch"><input type="checkbox" /><span class="slider"></span></label>`;
     li.querySelector(".cat-name").textContent = c.label;
+    if (c.active) {
+      const badge = li.querySelector(".soon");
+      badge.textContent = c.active;
+      badge.classList.add("active");
+    }
     const box = li.querySelector("input");
     box.checked = !!saved[c.id];
     box.addEventListener("change", () => {

@@ -62,6 +62,13 @@ main { padding: 12px 16px 16px; }
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .video-title:empty, .video-time:empty { display: none; }
+.speech-line {
+  margin-top: 8px; padding: 6px 8px; border-radius: 8px; font-size: 12px;
+  background: var(--card-2); border: 1px solid var(--border); color: var(--text);
+}
+.speech-line.good { border-color: var(--green-dim); color: #bbf7d0; }
+.speech-line.bad { border-color: #5b1d1d; color: var(--red); }
+.speech-line.dim { color: var(--muted); }
 .video-time { margin-top: 2px; font-variant-numeric: tabular-nums; color: var(--text); }
 
 /* Tabs */
@@ -161,6 +168,7 @@ input:focus { border-color: var(--green); }
   font-size: 10px; color: var(--muted); border: 1px solid var(--border);
   border-radius: 6px; padding: 1px 6px; white-space: nowrap;
 }
+.soon.active { color: var(--green); border-color: var(--green-dim); background: #0f2418; }
 
 /* Switch */
 .switch { position: relative; display: inline-block; width: 36px; height: 20px; flex: none; }

@@ -1,10 +1,18 @@
 {
   "manifest_version": 3,
   "name": "DeenScreen",
-  "version": "1.0.0",
-  "description": "Skip or mute the parts of a video you choose. Works on YouTube and regular HTML5 video.",
-  "permissions": ["storage", "scripting", "activeTab"],
+  "version": "3.1.0",
+  "description": "Skip or mute parts of videos. Filters profanity in YouTube subtitles and, with on-device AI, mutes spoken swear words on YouTube and in video files.",
+  "permissions": ["storage", "scripting", "activeTab", "offscreen"],
   "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';"
+  },
+  "cross_origin_embedder_policy": { "value": "require-corp" },
+  "cross_origin_opener_policy": { "value": "same-origin" },
   "action": {
     "default_title": "DeenScreen",
     "default_popup": "popup/popup.html",
@@ -22,8 +30,14 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["src/content.js"],
-      "run_at": "document_idle"
+      "js": ["src/mse-tap.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/profanity.js", "src/content.js"],
+      "run_at": "document_start"
     }
   ]
 }
